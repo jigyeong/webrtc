@@ -1,0 +1,9 @@
+{
+  "name": "webrtc",
+  "version": "1.0.0",
+  "description": "WebRTC Practice Project",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
