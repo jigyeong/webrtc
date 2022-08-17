@@ -21,10 +21,16 @@ const sockets = [];
 
 wss.on('connection',(socket)=> {
     sockets.push(socket);
-    console.log(socket,"=> Connected to Browser")
+    socket["nickname"] = "Anony"
     socket.on("close",()=> console.log("closed~!"))
     socket.on("message",(m)=> {
-        sockets.forEach(s=>s.send(m.toString('utf-8')))
+        const message = JSON.parse(m);
+        switch (message.type){
+            case "new_message" :
+                sockets.forEach(s=>s.send(`${socket.nickname} : ${message.payload}`))
+            case "nickname" :
+                socket["nickname"] = message.payload
+        }
     })
 })
 
