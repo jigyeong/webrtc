@@ -18,11 +18,14 @@ const wsServer = new Server(httpServer);
 
 wsServer.on("connection", (socket) => {
 
+    socket.onAny((event)=>{
+        console.log(`Socket Event : ${event}`);
+    })
     socket.on("enter_room", (msg, done) => {
-        console.log(msg);
-        setTimeout(()=>{
-            done("hello from the backend");
-        }, 3000);
+        socket.join(msg.payload)
+        console.log(socket.rooms) // See all connections
+        done();
+        socket.to(msg.payload).emit("welcome") // Send Except me
     })
 })
 
