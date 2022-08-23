@@ -31,6 +31,10 @@ function publicRooms(){
     return publicRooms;
 }
 
+function countRoom(roomName){
+    return wsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+
 wsServer.on("connection", (socket) => {
     socket["nickname"] = "anonymous"
     socket.onAny((event)=>{
@@ -40,10 +44,15 @@ wsServer.on("connection", (socket) => {
         socket.join(msg.payload)
         console.log(socket.rooms) // See all connections
         done();
-        socket.to(msg.payload).emit("welcome", socket.nickname) // Send Except me
+        socket.to(msg.payload).emit("welcome", socket.nickname, countRoom(msg.payload)) // Send Except me
+        wsServer.sockets.emit("room_change", publicRooms())
     })
-    socket.on("disconnecting", () => {
-        socket.rooms.forEach(room => socket.to(room).emit("bye",socket.nickname))
+    socket.on("disconnecting", (room) => {
+        socket.rooms.forEach(room => socket.to(room).emit("bye",socket.nickname, countRoom(room)-1))
+        wsServer.sockets.emit("room_change", publicRooms())
+    })
+    socket.on("disconnect", () => {
+        wsServer.sockets.emit("room_change", publicRooms())
     })
     socket.on("new_message", (msg, room, done)=>{
         socket.to(room).emit("new_message",`${socket.nickname} : ${msg}`);
