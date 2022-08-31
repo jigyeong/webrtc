@@ -72,10 +72,20 @@ function handleCameraClick(){
     cameraMuted = !cameraMuted
     if(!cameraMuted) cameraBtn.innerText = "Camera On"
     else cameraBtn.innerText = "Camera Off"
+
+    if(myPeerConnection){
+        const videoSender = myPeerConnection.getSenders().find(sender=> sender.track.kind==="video");
+        console.log(videoSender)
+    }
 }
 
 async function handleCameraChange(){
     await getMedia(cameraSelect.value)
+    if(myPeerConnection){
+        const videoTrack = myStream.getVideoTracks()[0];
+        const videoSender = myPeerConnection.getSenders().find(sender=> sender.track.kind==="video");
+        videoSender.replaceTrack(videoTrack);
+    }
 }
 
 audioBtn.addEventListener("click", handleAudioClick)
